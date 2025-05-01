@@ -8,6 +8,11 @@ export default function FileShare() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [downloadLink, setDownloadLink] = useState("");
+  const [pin, setPin] = useState("55555");
+  const [pinInput, setPinInput] = useState("");
+
+
+  const backendUrl = "https://backend-sp3c.onrender.com"; // Replace with your actual backend URL
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -21,9 +26,16 @@ export default function FileShare() {
     setUploading(true);
 
     try {
-      const backendUrl = "https://backend-sp3c.onrender.com"; // Replace with your actual backend URL
       const res = await axios.post(`${backendUrl}/upload`, formData);
           setDownloadLink(res.data.link);
+           setPin(res.data.pin);
+
+//        console.log("res:", res.data); // inside try
+// console.log("downloadLink:", downloadLink);
+// console.log("pin:", pin);
+
+           
+
     } catch (err) {
       console.error("Upload failed", err);
     } finally {
@@ -64,7 +76,9 @@ export default function FileShare() {
         )} */}
 
 {downloadLink && (
-  <>
+ 
+ <>
+  
     <div className="mt-4">
       <p className="text-green-600">Upload successful!</p>
       <a
@@ -89,8 +103,36 @@ export default function FileShare() {
     >
       Share via WhatsApp
     </a>
+
+         {/* SHOW THE PIN */}
+       <p className="mt-2 text-gray-700">
+         Share this PIN to download: {pin}
+      </p>
   </>
 )}
+
+  {/* DOWNLOAD BY PIN FORM */}
+   <div className="mt-6 bg-gray-50 p-4 rounded-lg shadow-inner w-full max-w-md">
+     <h2 className="font-semibold mb-2">Download by PIN</h2>
+     <div className="flex gap-2">
+       <input
+         type="text"
+         maxLength={5}
+         placeholder="Enter 5-digit PIN"
+         className="flex-1 border px-2 py-1 rounded"
+         onChange={e => setPinInput(e.target.value)}
+       />
+       <button
+         onClick={() => {
+           // simply navigate to download URL
+           window.location.href = `${backendUrl}/download/${pinInput}`;
+         }}
+         className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+       >
+         Download
+       </button>
+     </div>
+   </div>
 
 
 
